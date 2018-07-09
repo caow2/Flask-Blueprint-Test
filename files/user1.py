@@ -1,5 +1,6 @@
 from flask import Blueprint
 
+#Blueprints must have unique names
 page = Blueprint('user1_page', __name__)
 
 @page.route("/")
