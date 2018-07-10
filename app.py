@@ -2,20 +2,25 @@ from flask import Flask
 import sys
 import glob
 import os
+import fnmatch
 
 #Instead of doing all the imports for the blueprints manually
 #Automate the imports and the register_blueprints
 #A dictionary is needed to access each specific module that was imported
-os.chdir('./files/')
-sys.path.append(os.getcwd())
+os.chdir('./blueprints/')
 
 app = Flask(__name__)
 
 module_dict = {}
-for file in glob.glob('*.py'):
-    name = file[:-3] #excludes .py
-    module = __import__(name)
-    module_dict[name] = module
+#loop thru all subdirs in blueprints and import all .py files
+for dirName, subdirList, fileList in os.walk('.'): 
+    sys.path.append(dirName) #if the directory is not in sys.path, python doesn't know where to import from
+    for file in fileList:
+        if fnmatch.fnmatch(file, '*.py'):
+            name = file[:-3]
+            module = __import__(name)
+            module_dict[name] = module
+            print(module)
 
 for key in module_dict:
     app.register_blueprint(module_dict[key].page, url_prefix='/%s' % key) #i.e '/user1'
